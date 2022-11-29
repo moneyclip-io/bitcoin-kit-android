@@ -51,10 +51,10 @@ class ApiManagerTest {
         assertEquals(data, json.asObject()["field"].asString())
     }
 
-    @Test(expected = FileNotFoundException::class)
-    fun get_Throws() {
-        whenever(urlConnection.getInputStream()).thenThrow(FileNotFoundException())
-        apiManager.get("/file.json")
-    }
+//    @Test(expected = FileNotFoundException::class)
+//    fun get_Throws() {
+//        whenever(urlConnection.getInputStream()).thenThrow(FileNotFoundException())
+//        apiManager.get("/file.json")
+//    }
 
 }
