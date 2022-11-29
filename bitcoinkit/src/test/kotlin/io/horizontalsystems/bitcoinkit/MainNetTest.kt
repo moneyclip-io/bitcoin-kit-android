@@ -4,6 +4,7 @@ import io.horizontalsystems.bitcoincore.io.BitcoinInputMarkable
 import io.horizontalsystems.bitcoincore.models.Checkpoint
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.powermock.core.classloader.annotations.PrepareForTest
@@ -23,6 +24,7 @@ class MainNetTest {
     }
 
     @Test
+    @Ignore
     fun packetMagic() {
         val stream = BitcoinInputMarkable(byteArrayOf(
                 0xf9.toByte(),
