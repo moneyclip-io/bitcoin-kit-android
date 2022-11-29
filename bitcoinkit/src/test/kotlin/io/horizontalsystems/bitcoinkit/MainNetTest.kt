@@ -1,6 +1,7 @@
 package io.horizontalsystems.bitcoinkit
 
 import io.horizontalsystems.bitcoincore.io.BitcoinInputMarkable
+import io.horizontalsystems.bitcoincore.models.Checkpoint
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -17,7 +18,8 @@ class MainNetTest {
 
     @Before
     fun setup() {
-        network = MainNet()
+        val checkpoint = Checkpoint("file_name")
+        network = MainNet(checkpoint)
     }
 
     @Test
