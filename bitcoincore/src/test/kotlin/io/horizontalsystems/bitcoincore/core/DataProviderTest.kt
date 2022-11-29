@@ -37,10 +37,14 @@ object DataProviderTest : Spek({
             }
 
             it("starts loading transactions from that transaction") {
-                dataProvider.transactions(fromUid, limit).test().assertOf {
+                dataProvider.transactions(fromUid = fromUid, limit = limit).test().assertOf {
                     verify(storage).getValidOrInvalidTransaction(fromUid)
 
-                    verify(storage).getFullTransactionInfo(fromTransaction, limit)
+                    verify(storage).getFullTransactionInfo(
+                        fromTransaction = fromTransaction,
+                        limit = limit,
+                        type = null
+                    )
                 }
             }
         }
@@ -51,9 +55,13 @@ object DataProviderTest : Spek({
             }
 
             it("do not fetch transactions with `fromHash` and `fromTimestamp`") {
-                dataProvider.transactions(fromUid, limit).test().assertOf {
+                dataProvider.transactions(fromUid = fromUid, limit = limit).test().assertOf {
                     verify(storage).getValidOrInvalidTransaction(fromUid)
-                    verify(storage, never()).getFullTransactionInfo(null, limit)
+                    verify(storage, never()).getFullTransactionInfo(
+                        null,
+                        limit = limit,
+                        type = null
+                    )
                 }
             }
         }
@@ -64,7 +72,11 @@ object DataProviderTest : Spek({
             dataProvider.transactions(null, null).test().assertOf {
                 verify(storage, never()).getTransaction(any())
 
-                verify(storage).getFullTransactionInfo(null, null)
+                verify(storage).getFullTransactionInfo(
+                    fromTransaction = null,
+                    type = null,
+                    limit = null
+                )
             }
         }
     }
