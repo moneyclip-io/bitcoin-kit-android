@@ -44,10 +44,11 @@ class MainViewModel : ViewModel(), BitcoinKit.Listener {
 
     private lateinit var bitcoinKit: BitcoinKit
 
-    private val walletId = "FastSyncWallet13"
-    private val networkType = BitcoinKit.NetworkType.MainNet
+
+    private val walletId = "SyncDemoWallet1"
+    private val networkType = BitcoinKit.NetworkType.TestNet
     private val syncMode = BitcoinCore.SyncMode.Api()
-    private val bip = Bip.BIP44
+    private val bip = Bip.BIP84
 
     fun init() {
         //TODO create unique seed phrase,perhaps using shared preferences?
@@ -66,9 +67,10 @@ class MainViewModel : ViewModel(), BitcoinKit.Listener {
                 386526600, 187228578,
                 "00000000000000000005cff1d36f64f1ceef5d8a0da26ebbd671f1d1a9a1cff6".toReversedByteArray()), 750792)
 
+        val authKey = ""
 
-        bitcoinKit = BitcoinKit(App.instance, words, passphrase, walletId, networkType, syncMode = syncMode, bip = bip, block = mainnetBlock)
 
+        bitcoinKit = BitcoinKit(App.instance, words, passphrase, walletId, networkType, syncMode = syncMode, bip = bip, block = testNetBlock, authKey = authKey)
         bitcoinKit.listener = this
 
         networkName = bitcoinKit.networkName

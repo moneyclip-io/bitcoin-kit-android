@@ -163,7 +163,7 @@ class BitcoinCoreBuilder {
 
         val connectionManager = ConnectionManager(context)
 
-        val hdWallet = HDWallet(seed, network.coinType, purpose = bip.purpose)
+        val hdWallet = HDWallet(seed, network.coinType, purpose = bip.purpose, gapLimit = 5)
 
         val wallet = Wallet(hdWallet)
         val publicKeyManager = PublicKeyManager.create(storage, wallet, restoreKeyConverterChain)
