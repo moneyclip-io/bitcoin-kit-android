@@ -74,9 +74,11 @@ class BitcoinKit : AbstractKit {
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6,
             bip: Bip = Bip.BIP44,
-            block: Block? = null
+            block: Block? = null,
+            authKey: String
 
-    ) : this(context, Mnemonic().toSeed(words, passphrase), walletId, networkType, peerSize, syncMode, confirmationsThreshold, bip, block = block)
+
+    ) : this(context, Mnemonic().toSeed(words, passphrase), walletId, networkType, peerSize, syncMode, confirmationsThreshold, bip, block = block, authKey = authKey)
 
 
 
@@ -101,7 +103,8 @@ class BitcoinKit : AbstractKit {
             syncMode: SyncMode = SyncMode.Api(),
             confirmationsThreshold: Int = 6,
             bip: Bip = Bip.BIP44,
-            block: Block?
+            block: Block?,
+            authKey: String
     ) {
         val database = CoreDatabase.getInstance(context, getDatabaseName(networkType, walletId, syncMode, bip))
         val storage = Storage(database)
@@ -113,7 +116,7 @@ class BitcoinKit : AbstractKit {
                 MainNet(Checkpoint("", block))
             }
             NetworkType.TestNet -> {
-                initialSyncApi = BCoinApi("https://btc-testnet.horizontalsystems.xyz/api")
+                initialSyncApi = BlockchainApi("https://dev-api.moneyclip.io/blockchainapi", authKey)
                 TestNet(Checkpoint("", block))
             }
             NetworkType.RegTest -> {

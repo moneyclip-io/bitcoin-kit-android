@@ -23,17 +23,45 @@ class ApiManager(private val host: String) {
 
         logger.info("Fetching $url")
 
-        return try {
-            URL(url)
-                    .openConnection()
-                    .apply {
-                        connectTimeout = 5000
-                        readTimeout = 60000
-                        setRequestProperty("Accept", "application/json")
-                    }.getInputStream()
-                    .use {
-                        Json.parse(it.bufferedReader())
-                    }
+        try {
+            val response = (URL(url)
+                .openConnection() as HttpURLConnection).apply {
+                connectTimeout = 5000
+                readTimeout = 60000
+                requestMethod = "GET"
+                setRequestProperty("Accept", "application/json")
+            }
+
+            return response.inputStream
+                .use {
+                    Json.parse(it.bufferedReader())
+                }
+
+
+        } catch (exception: IOException) {
+            throw Exception("${exception.javaClass.simpleName}: $host")
+        }
+    }
+
+    @Throws
+    fun get(resource: String, authKey: String): JsonValue {
+        val url = "$host/$resource"
+
+        logger.info("Fetching $url")
+        try {
+            val response = (URL(url)
+                .openConnection() as HttpURLConnection).apply {
+                connectTimeout = 5000
+                readTimeout = 60000
+                requestMethod = "GET"
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("Authorization", authKey)
+            }
+            return response.inputStream
+                .use {
+                    Json.parse(it.bufferedReader())
+                }
+
         } catch (exception: IOException) {
             throw Exception("${exception.javaClass.simpleName}: $host")
         }
@@ -49,6 +77,33 @@ class ApiManager(private val host: String) {
             val url = URL(path)
             val urlConnection = url.openConnection() as HttpURLConnection
             urlConnection.requestMethod = "POST"
+            val out = BufferedOutputStream(urlConnection.outputStream)
+            val writer = BufferedWriter(OutputStreamWriter(out, "UTF-8"))
+            writer.write(data)
+            writer.flush()
+            writer.close()
+            out.close()
+
+            return urlConnection.inputStream.use {
+                Json.parse(it.bufferedReader())
+            }
+        } catch (exception: IOException) {
+            throw Exception("${exception.javaClass.simpleName}: $host")
+        }
+    }
+
+    @Throws
+    fun post(resource: String, data: String, jwt: String): JsonValue {
+        try {
+            val path = "$host/$resource"
+
+            logger.info("Fetching $path")
+
+            val url = URL(path)
+            val urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.requestMethod = "POST"
+            urlConnection.setRequestProperty("Content-Type", "application/json")
+            urlConnection.setRequestProperty("Authorization", "${jwt}")
             val out = BufferedOutputStream(urlConnection.outputStream)
             val writer = BufferedWriter(OutputStreamWriter(out, "UTF-8"))
             writer.write(data)

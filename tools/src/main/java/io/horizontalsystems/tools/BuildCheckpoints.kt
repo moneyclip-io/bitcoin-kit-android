@@ -5,6 +5,7 @@ import io.horizontalsystems.bitcoincash.TestNetBitcoinCash
 import io.horizontalsystems.bitcoincore.extensions.toHexString
 import io.horizontalsystems.bitcoincore.io.BitcoinOutput
 import io.horizontalsystems.bitcoincore.models.Block
+import io.horizontalsystems.bitcoincore.models.Checkpoint
 import io.horizontalsystems.bitcoincore.network.Network
 import io.horizontalsystems.bitcoinkit.MainNet
 import io.horizontalsystems.bitcoinkit.TestNet
@@ -21,8 +22,8 @@ class BuildCheckpoints : CheckpointSyncer.Listener {
 
     private val syncers = mutableListOf<CheckpointSyncer>().also {
         // Bitcoin
-        it.add(CheckpointSyncer(MainNet(), 2016, 1, this))
-        it.add(CheckpointSyncer(TestNet(), 2016, 1, this))
+        it.add(CheckpointSyncer(MainNet(Checkpoint("")), 2016, 1, this))
+        it.add(CheckpointSyncer(TestNet(Checkpoint("")), 2016, 1, this))
 
         // Bitcoin Cash
         it.add(CheckpointSyncer(MainNetBitcoinCash(), 147, 147, this))
