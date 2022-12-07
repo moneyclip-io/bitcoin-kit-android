@@ -6,10 +6,13 @@ import java.lang.Integer.min
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
-class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String) : IInitialSyncApi {
+class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String, jwtApiUrl: String, authKey: String) : IInitialSyncApi {
 
     private val transactionsApiManager = ApiManager(transactionApiUrl)
     private val blocksApiManager = ApiManager(blocksApiUrl)
+    private val jwtApiManager = ApiManager(jwtApiUrl)
+    private val authKey = authKey
+
 
     private fun getTransactions(addresses: List<String>, offset: Int = 0): List<TransactionResponse> {
         val joinedAddresses = addresses.joinToString("|")
@@ -36,8 +39,11 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String) : IIniti
     }
 
     private fun blocks(heights: List<Int>): List<BlockResponse> {
+        val jwtResponse = jwtApiManager.get("/authentication/requestJWT", authKey).asObject()
+        val jwt = jwtResponse.get("data").asObject().get("token").asString()
+
         val joinedHeights = heights.sorted().joinToString(",") { it.toString() }
-        val blocks = blocksApiManager.doOkHttpGet(false, "hashes?numbers=$joinedHeights").asArray()
+        val blocks = blocksApiManager.doOkHttpGet(false, "hashes?numbers=$joinedHeights", jwt).asArray()
 
         return blocks.map { blockJson ->
             val block = blockJson.asObject()

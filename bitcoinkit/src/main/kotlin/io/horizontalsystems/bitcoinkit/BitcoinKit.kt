@@ -112,7 +112,7 @@ class BitcoinKit : AbstractKit {
 
         network = when (networkType) {
             NetworkType.MainNet -> {
-                initialSyncApi = BlockchainComApi("https://blockchain.info", "https://api.blocksdecoded.com/v1/blockchains/bitcoin")
+                initialSyncApi = BlockchainComApi("https://blockchain.info", "https://dev-api.moneyclip.io/blockchainapi/bitcoin/mainnet", "https://dev-api.moneyclip.io/blockchainapi", authKey)
                 MainNet(Checkpoint("", block))
             }
             NetworkType.TestNet -> {

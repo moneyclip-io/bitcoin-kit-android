@@ -83,7 +83,7 @@ class BitcoinCashKit : AbstractKit {
 
         network = when (networkType) {
             is NetworkType.MainNet -> {
-                initialSyncApi = BlockchainComApi("https://api.haskoin.com/bch/blockchain", "https://api.blocksdecoded.com/v1/blockchains/bitcoin-cash")
+                initialSyncApi = BlockchainComApi("https://api.haskoin.com/bch/blockchain", "https://api.blocksdecoded.com/v1/blockchains/bitcoin-cash", "", "")
                 MainNetBitcoinCash(networkType.coinType)
             }
             NetworkType.TestNet -> {
