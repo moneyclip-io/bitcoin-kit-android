@@ -31,8 +31,13 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String, jwtApiUr
                 )
             }
 
+            var blockHeight : Int = -1
+            if (!transaction["block_height"].isNull) {
+                blockHeight = transaction["block_height"].asInt()
+            }
+
             TransactionResponse(
-                transaction["block_height"].asInt(),
+                blockHeight,
                 outputs
             )
         }
@@ -59,7 +64,11 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String, jwtApiUr
         val transactionResponses = getTransactions(addresses, offset)
         if (transactionResponses.isEmpty()) return listOf()
 
-        val blockHeights = transactionResponses.map { it.blockHeight }.toSet().toList()
+        val blockHeights = transactionResponses.filter { it.blockHeight != -1 }
+            .map { it.blockHeight }
+            .toSet()
+            .toList()
+
         val blocks = blocks(blockHeights)
 
         return transactionResponses.mapNotNull { transactionResponse ->
