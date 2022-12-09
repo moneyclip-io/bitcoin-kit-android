@@ -6,10 +6,13 @@ import java.lang.Integer.min
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
-class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String) : IInitialSyncApi {
+class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String, jwtApiUrl: String, authKey: String) : IInitialSyncApi {
 
     private val transactionsApiManager = ApiManager(transactionApiUrl)
     private val blocksApiManager = ApiManager(blocksApiUrl)
+    private val jwtApiManager = ApiManager(jwtApiUrl)
+    private val authKey = authKey
+
 
     private fun getTransactions(addresses: List<String>, offset: Int = 0): List<TransactionResponse> {
         val joinedAddresses = addresses.joinToString("|")
@@ -28,16 +31,24 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String) : IIniti
                 )
             }
 
+            var blockHeight : Int = -1
+            if (!transaction["block_height"].isNull) {
+                blockHeight = transaction["block_height"].asInt()
+            }
+
             TransactionResponse(
-                transaction["block_height"].asInt(),
+                blockHeight,
                 outputs
             )
         }
     }
 
     private fun blocks(heights: List<Int>): List<BlockResponse> {
+        val jwtResponse = jwtApiManager.get("/authentication/requestJWT", authKey).asObject()
+        val jwt = jwtResponse.get("data").asObject().get("token").asString()
+
         val joinedHeights = heights.sorted().joinToString(",") { it.toString() }
-        val blocks = blocksApiManager.doOkHttpGet(false, "hashes?numbers=$joinedHeights").asArray()
+        val blocks = blocksApiManager.doOkHttpGet(false, "hashes?numbers=$joinedHeights", jwt).asArray()
 
         return blocks.map { blockJson ->
             val block = blockJson.asObject()
@@ -53,7 +64,11 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String) : IIniti
         val transactionResponses = getTransactions(addresses, offset)
         if (transactionResponses.isEmpty()) return listOf()
 
-        val blockHeights = transactionResponses.map { it.blockHeight }.toSet().toList()
+        val blockHeights = transactionResponses.filter { it.blockHeight != -1 }
+            .map { it.blockHeight }
+            .toSet()
+            .toList()
+
         val blocks = blocks(blockHeights)
 
         return transactionResponses.mapNotNull { transactionResponse ->

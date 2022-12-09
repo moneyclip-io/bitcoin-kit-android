@@ -150,4 +150,36 @@ class ApiManager(private val host: String) {
             throw Exception("${e.javaClass.simpleName}: $host, ${e.localizedMessage}")
         }
     }
+
+    fun doOkHttpGet(safeCall: Boolean, uri: String, jwt: String): JsonValue {
+
+        val url = "$host/$uri"
+
+        try {
+            val httpClient: OkHttpClient = if (!safeCall)
+                NetworkUtils.getUnsafeOkHttpClient()
+            else {
+                OkHttpClient.Builder()
+                    .apply {
+                        connectTimeout(5000, TimeUnit.MILLISECONDS)
+                        readTimeout(60000, TimeUnit.MILLISECONDS)
+                    }.build()
+            }
+
+            httpClient.newCall(Request.Builder().url(url).addHeader("Authorization", jwt).build())
+                .execute()
+                .use { response ->
+
+                    if (response.isSuccessful) {
+                        response.body?.let {
+                            return Json.parse(it.string())
+                        }
+                    }
+
+                    throw IOException("Unexpected Error:$response")
+                }
+        } catch (e: Exception) {
+            throw Exception("${e.javaClass.simpleName}: $host, ${e.localizedMessage}")
+        }
+    }
 }
