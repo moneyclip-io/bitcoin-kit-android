@@ -44,7 +44,7 @@ class BlockchainComApi(transactionApiUrl: String, blocksApiUrl: String, jwtApiUr
     }
 
     private fun blocks(heights: List<Int>): List<BlockResponse> {
-        val jwtResponse = jwtApiManager.get("/authentication/requestJWT", authKey).asObject()
+        val jwtResponse = jwtApiManager.get("authentication/requestJWT", authKey).asObject()
         val jwt = jwtResponse.get("data").asObject().get("token").asString()
 
         val joinedHeights = heights.sorted().joinToString(",") { it.toString() }

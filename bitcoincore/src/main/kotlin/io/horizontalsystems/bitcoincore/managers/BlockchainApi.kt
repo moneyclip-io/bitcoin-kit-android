@@ -13,7 +13,7 @@ class BlockchainApi(host: String, authKey: String) : IInitialSyncApi {
 
     override fun getTransactions(addresses: List<String>): List<TransactionItem> {
 
-        val jwtResponse = jwtApiManager.get("/authentication/requestJWT", authKey).asObject()
+        val jwtResponse = jwtApiManager.get("authentication/requestJWT", authKey).asObject()
 
         val jwt = jwtResponse.get("data").asObject().get("token").asString()
 
